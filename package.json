@@ -1,6 +1,6 @@
 {
   "name": "next-typed-api-with-swr",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Typed APIs using SWR and Next.js",
   "main": "index.js",
   "scripts": {
