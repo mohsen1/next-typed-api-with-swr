@@ -1,11 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`generates correct content with default configurations 1`] = `
-[MockFunction] {
-  "calls": Array [
-    Array [
-      "/Users/mohsen_azimi/Desktop/NextJsTypedApiWithSwrPlugin/__tests__/__fixtures__/swr-api-types.ts",
-      "import { NextApiHandler } from \\"next\\";
+"import { NextApiHandler } from \\"next\\";
 import { Fetcher, SWRResponse } from \\"swr\\";
 import pages_api_users from \\"pages/api/users\\";
 
@@ -28,14 +24,5 @@ declare module \\"swr\\" {
     >;
   }
 }
-",
-    ],
-  ],
-  "results": Array [
-    Object {
-      "type": "return",
-      "value": undefined,
-    },
-  ],
-}
+"
 `;

@@ -20,5 +20,6 @@ it("generates correct content with default configurations", async () => {
   plugin.apply(compiler);
   await tapFn();
 
-  expect(spy).toMatchSnapshot();
+  expect(spy.mock.calls[0][0]).toContain("__fixtures__/swr-api-types.ts");
+  expect(spy.mock.calls[0][1]).toMatchSnapshot();
 });
