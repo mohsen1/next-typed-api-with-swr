@@ -2,6 +2,8 @@
 
 This Next.js plugin generates a TypeScript file to enhance the `useSWR` React Hook types so the return value is typed based on the path that is being fetched.
 
+[Example repository demonstrating it in action](https://github.com/mohsen1/automatic-use-swr-types)
+
 ## Installation
 
 Add this plugin to your Next.js configuration file:
