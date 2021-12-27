@@ -1,11 +1,16 @@
 // @ts-check
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 
 /** @typedef {Object} NextJsTypedApiWithSwrPluginOptions */
 /** @property {string} apiPath Path to the directory that contains Next.js API paths */
 /** @property {string} outputFilePath Path of output file to be written */
 
+/**
+ * Typed APIs using SWR and Next.js
+ * @see https://github.com/mohsen1/automatic-use-swr-types
+ */
 class NextJsTypedApiWithSwrPlugin {
   /**
    * @param {NextJsTypedApiWithSwrPluginOptions} options
@@ -36,11 +41,7 @@ class NextJsTypedApiWithSwrPlugin {
         const apiPath = path.resolve(compiler.context, this.options.apiPath);
         const outputFilePathDir = path.dirname(outputFilePath);
 
-        const output = await generateOutput(
-          apiPath,
-          compiler.context,
-          outputFilePath
-        );
+        const output = await generateOutput(apiPath, outputFilePath);
 
         // Create the directory to write the output file to.
         if (!fs.existsSync(outputFilePathDir)) {
@@ -54,6 +55,7 @@ class NextJsTypedApiWithSwrPlugin {
 }
 
 /**
+ * Walk a directory recursively and find all files
  * @param {string} dir
  * @returns {AsyncIterableIterator<string>}
  */
@@ -76,13 +78,15 @@ function sanitize(fileName) {
 
 /**
  * Generate output file's content
- * @param {string} apiPath API path
- * @param {string} basePath
- * @param {string} outputFilePath
+ * @param {string} apiPath Net.js API path. Often `pages/api`
+ * @param {string} outputFilePath Output file path
  * @returns
  */
-async function generateOutput(apiPath, basePath, outputFilePath) {
-  /** @type {string[]} */
+async function generateOutput(apiPath, outputFilePath) {
+  /**
+   * @type {[filePath: string, importPath: string][]}
+   * List of full file paths and import paths (from output file) of API files
+   */
   const apiFiles = [];
 
   for await (const file of walk(apiPath)) {
@@ -90,35 +94,41 @@ async function generateOutput(apiPath, basePath, outputFilePath) {
     const relativePath = path.relative(path.parse(outputFilePath).dir, file);
     const parsedPath = path.parse(relativePath);
     const importPath = path.join(parsedPath.dir, parsedPath.name);
-    apiFiles.push(importPath);
+    apiFiles.push([file, importPath]);
   }
 
-  const fileImports = apiFiles.map((file) => {
-    return `import ${sanitize(file)} from "${file}";`;
+  const fileImports = apiFiles.map(([_filePath, importPath]) => {
+    return `import ${sanitize(importPath)} from "${importPath}";`;
   });
 
-  const overloads = apiFiles.map((file) => {
-    const relativePath = path.relative(basePath, file);
-    const sanitizedFileName = sanitize(relativePath);
-    const apiPath = path.parse(relativePath).name;
+  const overloads = apiFiles.map(([filePath, importPath]) => {
+    const sanitizedFileName = sanitize(importPath);
+    const apiPathDirectoryName = apiPath.split(path.sep).pop();
+    const parsed = path.parse(
+      path.join(
+        "/",
+        apiPathDirectoryName,
+        path.relative(apiPath, filePath).split(path.sep).join("/")
+      )
+    );
+    const key = path.join(parsed.dir, parsed.name);
 
     return `
     <Error = any>(
-      key: "${apiPath}",
+      key: "${key}",
       fetcher?: Fetcher<
         InferNextApiHandlerResponseType<typeof ${sanitizedFileName}>,
-        "${apiPath}"
+        "${key}"
       >
     ): SWRResponse<
       InferNextApiHandlerResponseType<typeof ${sanitizedFileName}>,
       Error
-    >;
-    `;
+    >;`;
   });
 
   return `import { NextApiHandler } from "next";
 import { Fetcher, SWRResponse } from "swr";
-${fileImports.join("\n")}
+${fileImports.join(os.EOL)}
 
 
 type InferNextApiHandlerResponseType<T extends NextApiHandler> =
@@ -126,9 +136,10 @@ type InferNextApiHandlerResponseType<T extends NextApiHandler> =
 
 declare module "swr" {
   export interface SWRHook {
-${overloads.join("\n")}
+${overloads.join(os.EOL)}
   }
-}`;
+}
+`;
 }
 
 function withNextJsTypedApiWithSwrPlugin(nextConfig = {}, options = {}) {
