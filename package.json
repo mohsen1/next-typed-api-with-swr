@@ -1,0 +1,11 @@
+{
+  "name": "next-typed-api-with-swr",
+  "version": "1.0.0",
+  "description": "Typed APIs using SWR and Next.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Mohsen Azimi <me@azimi.me>",
+  "license": "MIT"
+}
