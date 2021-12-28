@@ -3,9 +3,11 @@ const fs = require("fs");
 const path = require("path");
 const os = require("os");
 
-/** @typedef {Object} NextJsTypedApiWithSwrPluginOptions */
-/** @property {string} apiPath Path to the directory that contains Next.js API paths */
-/** @property {string} outputFilePath Path of output file to be written */
+/**
+ * @typedef {Object} NextJsTypedApiWithSwrPluginOptions
+ * @property {string=} apiPath Path to the directory that contains Next.js API paths
+ * @property {string=} outputFilePath Path of output file to be written
+ */
 
 /**
  * Typed APIs using SWR and Next.js
@@ -13,9 +15,10 @@ const os = require("os");
  */
 class NextJsTypedApiWithSwrPlugin {
   /**
-   * @param {NextJsTypedApiWithSwrPluginOptions} options
+   * @param options {NextJsTypedApiWithSwrPluginOptions}
    */
   constructor(options = {}) {
+    /** @type {NextJsTypedApiWithSwrPluginOptions} */
     this.options = {
       apiPath: "pages/api",
       outputFilePath: "swr-api-types.ts",
