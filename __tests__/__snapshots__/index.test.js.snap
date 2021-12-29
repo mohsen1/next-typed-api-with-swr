@@ -3,6 +3,7 @@
 exports[`NextJsTypedApiWithSwrPlugin generates correct content with custom configurations 1`] = `
 "import { NextApiHandler } from \\"next\\";
 import { Fetcher, SWRResponse } from \\"swr\\";
+import ___pages_api__id_ from \\"../pages/api/[id]\\";
 import ___pages_api_users from \\"../pages/api/users\\";
 
 
@@ -11,6 +12,17 @@ type InferNextApiHandlerResponseType<T extends NextApiHandler> =
 
 declare module \\"swr\\" {
   export interface SWRHook {
+
+    <Error = any>(
+      key: \`/api/\${string}\`,
+      fetcher?: Fetcher<
+        InferNextApiHandlerResponseType<typeof ___pages_api__id_>,
+        \`/api/\${string}\`
+      >
+    ): SWRResponse<
+      InferNextApiHandlerResponseType<typeof ___pages_api__id_>,
+      Error
+    >;
 
     <Error = any>(
       key: \\"/api/users\\",
@@ -30,6 +42,7 @@ declare module \\"swr\\" {
 exports[`NextJsTypedApiWithSwrPlugin generates correct content with default configurations 1`] = `
 "import { NextApiHandler } from \\"next\\";
 import { Fetcher, SWRResponse } from \\"swr\\";
+import pages_api__id_ from \\"pages/api/[id]\\";
 import pages_api_users from \\"pages/api/users\\";
 
 
@@ -38,6 +51,17 @@ type InferNextApiHandlerResponseType<T extends NextApiHandler> =
 
 declare module \\"swr\\" {
   export interface SWRHook {
+
+    <Error = any>(
+      key: \`/api/\${string}\`,
+      fetcher?: Fetcher<
+        InferNextApiHandlerResponseType<typeof pages_api__id_>,
+        \`/api/\${string}\`
+      >
+    ): SWRResponse<
+      InferNextApiHandlerResponseType<typeof pages_api__id_>,
+      Error
+    >;
 
     <Error = any>(
       key: \\"/api/users\\",

@@ -114,14 +114,24 @@ async function generateOutput(apiPath, outputFilePath) {
         path.relative(apiPath, filePath).split(path.sep).join("/")
       )
     );
-    const key = path.join(parsed.dir, parsed.name);
+    let key = path.join(parsed.dir, parsed.name);
+    let keyPaddingChar = '"';
+
+    const PATH_PARAMETER_REGEX = /\[([A-z0-9]+)\]/g;
+    if (PATH_PARAMETER_REGEX.test(key)) {
+      key = key.replace(
+        PATH_PARAMETER_REGEX,
+        (m) => "${string}" // `\${${m.substring(1, m.length - 1)}}`
+      );
+      keyPaddingChar = "`";
+    }
 
     return `
     <Error = any>(
-      key: "${key}",
+      key: ${keyPaddingChar}${key}${keyPaddingChar},
       fetcher?: Fetcher<
         InferNextApiHandlerResponseType<typeof ${sanitizedFileName}>,
-        "${key}"
+        ${keyPaddingChar}${key}${keyPaddingChar}
       >
     ): SWRResponse<
       InferNextApiHandlerResponseType<typeof ${sanitizedFileName}>,
